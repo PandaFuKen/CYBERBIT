@@ -10,12 +10,12 @@ FPS = 30  # Frame por segundo
 # Mapa del nivel: 1 = pared, 0 = espacio libre, 2 = píldora
 nivel = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-    [1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
-    [1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1],
     [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1],
-    [1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
@@ -25,14 +25,14 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO))  # Mostrar pantalla
 clock = pygame.time.Clock()
 
 # Jugador (Pac-Man)
-jugador_imagen = pygame.image.load("./Assets/images/Panda.png")  # Asegúrate de tener una imagen de Pac-Man
+jugador_imagen = pygame.image.load("CYBERBIT\Assets\images\Panda.png")  # Asegúrate de tener una imagen de Pac-Man
 jugador_rect = jugador_imagen.get_rect()
-jugador_rect.x, jugador_rect.y = 100, 100
+jugador_rect.x, jugador_rect.y = 120, 100
 
 # Fantasmas
 fantasmas = []
 for _ in range(3):  # 3 fantasmas
-    fantasma_imagen = pygame.image.load("./Assets/images/Panda.png")  # Asegúrate de tener una imagen de fantasma
+    fantasma_imagen = pygame.image.load("CYBERBIT\Assets\images\Michelle.png")  # Asegúrate de tener una imagen de fantasma
     fantasma_rect = fantasma_imagen.get_rect()
     fantasma_rect.x = random.randint(1, len(nivel[0]) - 2) * TAMANO_CELDA
     fantasma_rect.y = random.randint(1, len(nivel) - 2) * TAMANO_CELDA

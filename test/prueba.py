@@ -9,7 +9,7 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Personaje en 8 bits con movilidad")
 
 # Cargar imagen del personaje
-personaje = pygame.image.load("./Assets/images/Panda.png")  # Asegúrate de tener un PNG
+personaje = pygame.image.load("CYBERBIT/Assets/images/Panda.png")  # Asegúrate de tener un PNG
 personaje = pygame.transform.scale(personaje, (50, 50))  # Ajustar tamaño
 
 # Posición inicial del personaje

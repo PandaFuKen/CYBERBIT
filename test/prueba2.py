@@ -27,9 +27,9 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO)) # Mostrar pantalla
 clock = pygame.time.Clock()
 
 # Jugador (cambiar rectángulo por imagen)
-jugador_imagen = pygame.image.load("./Assets/images/Panda.png")  # Cargar imagen del jugador
+jugador_imagen = pygame.image.load("CYBERBIT/Assets/images/Panda.png")  # Cargar imagen del jugador
 jugador_rect = jugador_imagen.get_rect()
-jugador_rect.x, jugador_rect.y = 100, 300
+jugador_rect.x, jugador_rect.y = 100, 290
 vel_y = 0
 en_suelo = False
 
