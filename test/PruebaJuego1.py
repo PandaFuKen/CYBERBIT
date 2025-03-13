@@ -28,14 +28,17 @@ FUERZA_SALTO = -16  # Fuerza del salto
 
 # Jugador
 jugador_x, jugador_y = 90, 280
-anchoJugador, alturaJugador = 30, 30
+anchoJugador, alturaJugador = 70, 70  # Actualizado a 70x70
 velocidad_y = 0
 en_suelo = False
+frame_index = 0
+animacion_reposo = 0.1  # Tiempo entre frames de la animación
+tiempo_desde_ultimo_frame = 0
 
 # Monedas
 moneda = 0
 
-#Vidas
+# Vidas
 vidas = 3
 
 # Mapa del nivel
@@ -48,7 +51,7 @@ nivel = [
     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],  
+    [0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -63,22 +66,54 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO))
 clock = pygame.time.Clock()
 
 # Cargar imagen del jugador
-Jugador_Imagen = pygame.image.load("CYBERBIT/Assets/images/Zorrito.png")
-Jugador_Imagen = pygame.transform.scale(Jugador_Imagen, (anchoJugador, alturaJugador))  # Ajustar tamaño
-# Cargar imagen de fondo
-imagenFondo = pygame.image.load('CYBERBIT/Assets/images/Free-Pixel-Art-Cloud-and-Sky-Backgrounds5.jpg')
-imagenFondo = pygame.transform.scale(imagenFondo, (ANCHO, ALTO))
-#Imagen del portal
-Portal = pygame.image.load('CYBERBIT/Assets/images/Portal1.png')
-Portal = pygame.transform.scale(Portal, (50, 50))
-#Imagen de la moneda
-Moneda = pygame.image.load('CYBERBIT/Assets/images/Moneda.png')
-Moneda = pygame.transform.scale(Moneda, (50, 50))
-sonidoMoneda = pygame.mixer.Sound("CYBERBIT/Assets/sounds/Moneda.wav")
-JuegoTerminado = pygame.mixer.Sound("CYBERBIT/Assets/sounds/GameEnd.wav")
+# Cargar los frames de la animación en una lista
+reposo_frames = [
+    pygame.image.load("./Assets/images/Zorrito/Zorrito en REPOSO1.png"),
+    pygame.image.load("./Assets/images/Zorrito/Zorrito en REPOSO2.png"),
+    pygame.image.load("./Assets/images/Zorrito/Zorrito en REPOSO3.png"),
+    pygame.image.load("./Assets/images/Zorrito/Zorrito en REPOSO4.png")
+]
+# Ajustamos el tamaño de los frames
+reposo_frames = [pygame.transform.scale(frame, (70, 70)) for frame in reposo_frames]
 
-#Imagen de las Plataformas
-Suelo = pygame.image.load('CYBERBIT/Assets/images/Suelo.png')
+# Cargar los frames de la animación de caminar
+caminar_frames = [
+    pygame.image.load("./Assets/images/Zorrito/Caminando/Zorrito Caminando1.png"),
+    pygame.image.load("./Assets/images/Zorrito/Caminando/Zorrito Caminando2.png"),
+    pygame.image.load("./Assets/images/Zorrito/Caminando/Zorrito Caminando3.png"),
+    pygame.image.load("./Assets/images/Zorrito/Caminando/Zorrito Caminando4.png")
+]
+# Ajustamos el tamaño de los frames de caminar
+caminar_frames = [pygame.transform.scale(frame, (70, 70)) for frame in caminar_frames]
+
+# Cargar los frames de la animación de caminar ATRAS
+caminar_atras_frames = [
+    pygame.image.load("./Assets/images/Zorrito/Caminando ATRAS/Zorrito Caminando ATRAS1.png"),
+    pygame.image.load("./Assets/images/Zorrito/Caminando ATRAS/Zorrito Caminando ATRAS2.png"),
+    pygame.image.load("./Assets/images/Zorrito/Caminando ATRAS/Zorrito Caminando ATRAS3.png"),
+    pygame.image.load("./Assets/images/Zorrito/Caminando ATRAS/Zorrito Caminando ATRAS4.png")
+]
+# Ajustamos el tamaño de los frames de caminar ATRAS
+caminar_atras_frames = [pygame.transform.scale(frame, (70, 70)) for frame in caminar_atras_frames]
+
+# Cargar y ajustar el tamaño de la imagen del jugador
+Jugador_Imagen = pygame.image.load("./Assets/images/Zorrito/Zorrito en REPOSO1.png")
+Jugador_Imagen = pygame.transform.scale(Jugador_Imagen, (70, 70))  # Ajustado a 70x70
+
+# Cargar imagen de fondo
+imagenFondo = pygame.image.load('./Assets/images/Free-Pixel-Art-Cloud-and-Sky-Backgrounds5.jpg')
+imagenFondo = pygame.transform.scale(imagenFondo, (ANCHO, ALTO))
+# Imagen del portal
+Portal = pygame.image.load('./Assets/images/Portal1.png')
+Portal = pygame.transform.scale(Portal, (50, 50))
+# Imagen de la moneda
+Moneda = pygame.image.load('./Assets/images/Moneda.png')
+Moneda = pygame.transform.scale(Moneda, (50, 50))
+sonidoMoneda = pygame.mixer.Sound("./Assets/sounds/Moneda.wav")
+JuegoTerminado = pygame.mixer.Sound("./Assets/sounds/GameEnd.wav")
+
+# Imagen de las Plataformas
+Suelo = pygame.image.load('./Assets/images/Suelo.png')
 Suelo = pygame.transform.scale(Suelo, (50, 50))
 
 # Función para contar las monedas
@@ -87,20 +122,27 @@ def conteoMonedas(monedas):
     text = font.render("Monedas: " + str(moneda), True, blanco)
     text_rect = text.get_rect(center=(60, 10))
     pantalla.blit(text, text_rect)
-    
+
 def conteoVidas(vidas):
     font = pygame.font.Font(None, 32)
     text = font.render("Vidas: " + str(vidas), True, blanco)
     text_rect = text.get_rect(center=(60, 50))
     pantalla.blit(text, text_rect)
 
+# Función para actualizar el frame de la animación
+def actualizar_frame_animacion(tiempo_transcurrido, frames):
+    global frame_index, tiempo_desde_ultimo_frame
+    tiempo_desde_ultimo_frame += tiempo_transcurrido
+    if tiempo_desde_ultimo_frame >= animacion_reposo:
+        frame_index = (frame_index + 1) % len(frames)
+        tiempo_desde_ultimo_frame = 0
+
 # Bucle del juego
 corriendo = True
 while corriendo:
-    #pantalla.fill(azulCielo)
-    # Dibujar la imagen de fondo
-    pantalla.blit(imagenFondo, (0, 0))
-    
+    tiempo_transcurrido = clock.get_time() / 1500  # Tiempo transcurrido en segundos
+    pantalla.blit(imagenFondo, (0, 0))  # Dibujar la imagen de fondo
+
     # Dibujar el contador de monedas y de vidas
     conteoVidas(vidas)
     conteoMonedas(moneda)
@@ -115,7 +157,7 @@ while corriendo:
                 muros.append(rect)
             if nivel[fila][columna] == 2:  # Meta
                 pantalla.blit(Portal, (columna * TAMANO_CELDA, fila * TAMANO_CELDA))
-            
+
     monedas = []
     for fila in range(len(nivel)):
         for col in range(len(nivel[fila])):
@@ -123,14 +165,17 @@ while corriendo:
                 monedas.append((col * TAMANO_CELDA, fila * TAMANO_CELDA))
                 pantalla.blit(Moneda, (col * TAMANO_CELDA, fila * TAMANO_CELDA))
 
-
     # Obtener controles
     Controles = pygame.key.get_pressed()
     mov_x = 0
     if Controles[pygame.K_LEFT]:
         mov_x = -VelocidadJugador
-    if Controles[pygame.K_RIGHT]:
+        mirando_atras = True
+    elif Controles[pygame.K_RIGHT]:
         mov_x = VelocidadJugador
+        mirando_atras = False
+    else:
+        mirando_atras = None
 
     # Aplicar movimiento en X y verificar colisiones
     jugador_x += mov_x
@@ -162,12 +207,22 @@ while corriendo:
                 velocidad_y = 0
 
     # Salto
-    if Controles[pygame.K_UP] and en_suelo:#Al dar click en la flecha hacia arriba, el jugador salta
+    if Controles[pygame.K_UP] and en_suelo:  # Al dar click en la flecha hacia arriba, el jugador salta
         velocidad_y = FUERZA_SALTO
         en_suelo = False
 
-    # Dibujar al jugador en la nueva posición
-    pantalla.blit(Jugador_Imagen, (jugador_x, jugador_y))
+    # Actualizar y dibujar el jugador
+    if mov_x == 0 and en_suelo:  # Si el jugador está en reposo
+        actualizar_frame_animacion(tiempo_transcurrido, reposo_frames)
+        pantalla.blit(reposo_frames[frame_index], (jugador_x, jugador_y))
+    elif mov_x > 0 and en_suelo:  # Si el jugador está caminando
+        actualizar_frame_animacion(tiempo_transcurrido, caminar_frames)
+        pantalla.blit(caminar_frames[frame_index], (jugador_x, jugador_y))
+    elif mov_x < 0 and en_suelo:  # Si el jugador está caminando atras
+        actualizar_frame_animacion(tiempo_transcurrido, caminar_atras_frames)
+        pantalla.blit(caminar_atras_frames[frame_index], (jugador_x, jugador_y))
+    else:
+        pantalla.blit(Jugador_Imagen, (jugador_x, jugador_y))
 
     # Manejar eventos
     for evento in pygame.event.get():
@@ -181,13 +236,9 @@ while corriendo:
                     moneda_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
                     if jugador.colliderect(moneda_rect):
                         nivel[fila][col] = 0  # Cambiar el valor a 0 para eliminar la moneda del mapa
-                        # Reproducir el sonido
-                        sonidoMoneda.play()
-                        # Esperar a que termine el sonido
-                        #pygame.time.wait(int(sonidoMoneda.get_length() * 1000))
+                        sonidoMoneda.play()  # Reproducir el sonido
                         moneda += 1
                         conteoMonedas(moneda)
-
 
     # Comprobar si toca la meta
     for fila in range(len(nivel)):
@@ -196,7 +247,7 @@ while corriendo:
                 meta_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
                 if jugador.colliderect(meta_rect):
                     JuegoTerminado.play()
-                    messagebox.showinfo("Mensaje","Felicidades, ¡Has ganado!, Monedas recogidas: " + str(moneda))
+                    messagebox.showinfo("Mensaje", "Felicidades, ¡Has ganado!, Monedas recogidas: " + str(moneda))
                     # Cerrar la ventana principal
                     root.destroy()
                     corriendo = False
