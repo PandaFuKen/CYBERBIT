@@ -1,104 +1,138 @@
 import pygame
+import sys
+import tkinter as tk
+from tkinter import messagebox
 
-# Configuración básica
-ANCHO, ALTO = 800, 400 # Tamaño de la pantalla
-TAMANO_CELDA = 40 # Tamaño de las celdas del nivel
-GRAVEDAD = 1 # Gravedad del juego
-VELOCIDAD_X = 5 # Velocidad de movimiento lateral
-FUERZA_SALTO = -15 # Fuerza del salto
+root = tk.Tk()
+root.withdraw()  # Ocultar la ventana principal
 
-# Mapa del nivel (1 = suelo/plataforma, 0 = espacio vacío, 2 = meta)
+# Colores
+blanco = (255, 255, 255)
+
+# Configuración del juego
+ANCHO, ALTO = 800, 600
+TAMANO_CELDA = 40
+gravedad = 1
+VelocidadJugador = 7
+FUERZA_SALTO = -16  # Fuerza del salto
+
+# Jugador
+jugador_x, jugador_y = 90, 280
+anchoJugador, alturaJugador = 70, 70
+velocidad_y = 0
+en_suelo = False
+vidas = 3
+
+# Mapa del nivel
 nivel = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 2, 0, 0, 1], # La meta (2) al final
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1],   
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    [0] * 20,
+    [0] * 20,
+    [0] * 20,
+    [0] * 20,
+    [0] * 20,
+    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0] * 20,
+    [0] * 20,
+    [0] * 20,
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1]
 ]
 
 # Inicializar pygame
 pygame.init()
-pantalla = pygame.display.set_mode((ANCHO, ALTO)) # Mostrar pantalla
+pantalla = pygame.display.set_mode((ANCHO, ALTO))
 clock = pygame.time.Clock()
 
-# Jugador (cambiar rectángulo por imagen)
-jugador_imagen = pygame.image.load("CYBERBIT/Assets/images/Panda.png")  # Cargar imagen del jugador
-jugador_rect = jugador_imagen.get_rect()
-jugador_rect.x, jugador_rect.y = 100, 290
-vel_y = 0
-en_suelo = False
+# Cargar imágenes
+Suelo = pygame.Surface((TAMANO_CELDA, TAMANO_CELDA))
+Suelo.fill((139, 69, 19))  # Color marrón para el suelo
 
-# Función para dibujar el nivel
-def dibujar_nivel():
-    for fila in range(len(nivel)):
-        for col in range(len(nivel[fila])):
-            x, y = col * TAMANO_CELDA, fila * TAMANO_CELDA
-            if nivel[fila][col] == 1:
-                pygame.draw.rect(pantalla, (100, 50, 0), (x, y, TAMANO_CELDA, TAMANO_CELDA))  # Dibujar tamaño de cuadro del mapa
-            elif nivel[fila][col] == 2:  # Meta
-                pygame.draw.rect(pantalla, (255, 255, 0), (x, y, TAMANO_CELDA, TAMANO_CELDA))  # Meta en amarillo
+# Cargar sonido
+JuegoTerminado = pygame.mixer.Sound("./Assets/sounds/GameEnd.wav")
 
-# Función de colisión con plataformas
-def colisiona(nuevo_rect):
-    for fila in range(len(nivel)):
-        for col in range(len(nivel[fila])):
-            if nivel[fila][col] == 1:
-                pared = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
-                if nuevo_rect.colliderect(pared):
-                    return True
-    return False
+# Función para contar vidas
+def conteoVidas(vidas):
+    font = pygame.font.Font(None, 32)
+    text = font.render("Vidas: " + str(vidas), True, blanco)
+    pantalla.blit(text, (10, 10))
+
+# Función lambda para verificar si el jugador ha caído
+verificar_muerte_por_caida = lambda y: y > ALTO
 
 # Bucle del juego
 corriendo = True
 while corriendo:
-    pantalla.fill((50, 50, 50))  # Fondo gris oscuro
-    dibujar_nivel()
-    pantalla.blit(jugador_imagen, jugador_rect)  # Dibujar la imagen del jugador
+    pantalla.fill((12, 183, 242))  # Fondo azul cielo
+    conteoVidas(vidas)
 
-    # Eventos
+    # Dibujar el mapa
+    muros = []
+    for fila in range(len(nivel)):
+        for columna in range(len(nivel[fila])):
+            if nivel[fila][columna] == 1:
+                rect = pygame.Rect(columna * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
+                pantalla.blit(Suelo, (columna * TAMANO_CELDA, fila * TAMANO_CELDA))
+                muros.append(rect)
+
+    # Obtener controles
+    Controles = pygame.key.get_pressed()
+    mov_x = 0
+    if Controles[pygame.K_LEFT]:
+        mov_x = -VelocidadJugador
+    elif Controles[pygame.K_RIGHT]:
+        mov_x = VelocidadJugador
+
+    # Aplicar movimiento en X y verificar colisiones
+    jugador_x += mov_x
+    jugador = pygame.Rect(jugador_x, jugador_y, anchoJugador, alturaJugador)
+
+    for muro in muros:
+        if jugador.colliderect(muro):
+            if mov_x > 0:  # Moviendo a la derecha
+                jugador_x = muro.left - anchoJugador
+            elif mov_x < 0:  # Moviendo a la izquierda
+                jugador_x = muro.right
+
+    # Aplicar gravedad
+    velocidad_y += gravedad
+
+    # Mover en Y y verificar colisiones
+    jugador_y += velocidad_y
+    jugador = pygame.Rect(jugador_x, jugador_y, anchoJugador, alturaJugador)
+
+    en_suelo = False
+    for muro in muros:
+        if jugador.colliderect(muro):
+            if velocidad_y > 0:  # Si está cayendo
+                jugador_y = muro.top - alturaJugador
+                velocidad_y = 0
+                en_suelo = True
+            elif velocidad_y < 0:  # Si golpea el techo
+                jugador_y = muro.bottom
+                velocidad_y = 0
+
+    # Salto
+    if Controles[pygame.K_UP] and en_suelo:
+        velocidad_y = FUERZA_SALTO
+        en_suelo = False
+
+    # Verificar si el jugador ha caído fuera del nivel
+    if verificar_muerte_por_caida(jugador_y):
+        vidas -= 1
+        jugador_x, jugador_y = 90, 280  # Reiniciar posición
+        velocidad_y = 0
+        if vidas <= 0:
+            JuegoTerminado.play()
+            messagebox.showinfo("Game Over", "Has perdido todas tus vidas.")
+            pygame.quit()
+            sys.exit()
+
+    # Dibujar al jugador
+    pygame.draw.rect(pantalla, (255, 0, 0), (jugador_x, jugador_y, anchoJugador, alturaJugador))  # Rojo
+
+    # Manejar eventos
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             corriendo = False
-
-    # Movimiento lateral
-    teclas = pygame.key.get_pressed()
-    if teclas[pygame.K_LEFT]:  # Movimiento a la izquierda
-        nuevo_rect = jugador_rect.move(-VELOCIDAD_X, 0)
-        if not colisiona(nuevo_rect):
-            jugador_rect.x -= VELOCIDAD_X
-    if teclas[pygame.K_RIGHT]:  # Movimiento a la derecha
-        nuevo_rect = jugador_rect.move(VELOCIDAD_X, 0)
-        if not colisiona(nuevo_rect):
-            jugador_rect.x += VELOCIDAD_X
-
-    # Salto
-    if teclas[pygame.K_UP] and en_suelo:
-        vel_y = FUERZA_SALTO
-        en_suelo = False
-
-    # Aplicar gravedad
-    vel_y += GRAVEDAD
-    nuevo_rect = jugador_rect.move(0, vel_y)
-
-    if not colisiona(nuevo_rect):
-        jugador_rect.y += vel_y
-    else:
-        vel_y = 0
-        en_suelo = True
-
-    # Comprobar si toca la meta
-    for fila in range(len(nivel)):
-        for col in range(len(nivel[fila])):
-            if nivel[fila][col] == 2:  # Meta
-                meta_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
-                if jugador_rect.colliderect(meta_rect):
-                    print("¡Has ganado!")
-                    corriendo = False
 
     pygame.display.flip()
     clock.tick(30)

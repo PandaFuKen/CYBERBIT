@@ -66,6 +66,7 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO))
 clock = pygame.time.Clock()
 
 # Cargar imagen del jugador
+
 # Cargar los frames de la animación en una lista
 reposo_frames = [
     pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO1.png"),
@@ -136,6 +137,9 @@ def actualizar_frame_animacion(tiempo_transcurrido, frames):
     if tiempo_desde_ultimo_frame >= animacion_reposo:
         frame_index = (frame_index + 1) % len(frames)
         tiempo_desde_ultimo_frame = 0
+        
+#Funcion de muerte por caida  lamba
+verificar_muerte = lambda y: y > ALTO
 
 # Bucle del juego
 corriendo = True
@@ -146,7 +150,7 @@ while corriendo:
     # Dibujar el contador de monedas y de vidas
     conteoVidas(vidas)
     conteoMonedas(moneda)
-
+    
     # Dibujar el mapa
     muros = []
     for fila in range(len(nivel)):
@@ -190,6 +194,18 @@ while corriendo:
 
     # Aplicar gravedad
     velocidad_y += gravedad
+    
+    #Cuando el jugador se cae de la pantalla 
+    if verificar_muerte(jugador_y):
+        vidas -= 1
+        jugador_x, jugador_y = 90, 280  # Reiniciar la posición
+        velocidad_y = 0
+        if vidas <= 0:
+            JuegoTerminado.play()
+            messagebox.showinfo("Game Over", "Has perdido todas tus vidas.")
+            pygame.quit()
+            sys.exit()
+
 
     # Mover en Y y verificar colisiones
     jugador_y += velocidad_y
@@ -251,6 +267,7 @@ while corriendo:
                     # Cerrar la ventana principal
                     root.destroy()
                     corriendo = False
+    
 
     pygame.display.flip()
     clock.tick(30)
