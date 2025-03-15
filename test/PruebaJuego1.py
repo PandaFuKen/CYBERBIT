@@ -28,7 +28,7 @@ FUERZA_SALTO = -16  # Fuerza del salto
 
 # Jugador
 jugador_x, jugador_y = 90, 280
-anchoJugador, alturaJugador = 70, 70  # Actualizado a 70x70
+anchoJugador, alturaJugador = 50, 50  # Actualizado a 70x70
 velocidad_y = 0
 en_suelo = False
 frame_index = 0
