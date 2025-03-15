@@ -66,6 +66,17 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO))
 clock = pygame.time.Clock()
 
 # Cargar imagen del jugador
+
+# Cargar los frames de la animación en una lista
+reposo_frames = [
+    pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO1.png"),
+    pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO2.png"),
+    pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO3.png"),
+    pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO4.png")
+]
+# Ajustamos el tamaño de los frames
+reposo_frames = [pygame.transform.scale(frame, (70, 70)) for frame in reposo_frames]
+
 # Cargar los frames de la animación en una lista
 reposo_frames = [
     pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO1.png"),
@@ -117,6 +128,7 @@ Suelo = pygame.image.load('./Assets/images/Suelo.png')
 Suelo = pygame.transform.scale(Suelo, (50, 50))
 
 # Función para contar las monedas
+
 def conteoMonedas(monedas):
     font = pygame.font.Font(None, 32)
     text = font.render("Monedas: " + str(moneda), True, blanco)
@@ -129,6 +141,21 @@ def conteoVidas(vidas):
     text_rect = text.get_rect(center=(60, 50))
     pantalla.blit(text, text_rect)
 
+conteoMonedas = lambda monedas: pantalla.blit(pygame.font.Font(None, 32).render("Monedas: " + str(monedas), True, blanco), (60, 10))
+
+# Función para contar las vidas
+conteoVidas = lambda vidas: pantalla.blit(pygame.font.Font(None, 32).render("Vidas: " + str(vidas), True, blanco), (60, 50))
+
+# Función para actualizar el frame de la animación
+def actualizar_frame_animacion(tiempo_transcurrido, frames):
+    global frame_index, tiempo_desde_ultimo_frame
+    tiempo_desde_ultimo_frame += tiempo_transcurrido
+    if tiempo_desde_ultimo_frame >= animacion_reposo:
+        frame_index = (frame_index + 1) % len(frames)
+        tiempo_desde_ultimo_frame = 0
+
+# Función de muerte por caída
+verificar_muerte = lambda y: y > ALTO
 # Función para actualizar el frame de la animación
 def actualizar_frame_animacion(tiempo_transcurrido, frames):
     global frame_index, tiempo_desde_ultimo_frame
@@ -145,8 +172,8 @@ while corriendo:
 
     # Dibujar el contador de monedas y de vidas
     conteoVidas(vidas)
-    conteoMonedas(moneda)
-
+    conteoMonedas(moneda)   
+    
     # Dibujar el mapa
     muros = []
     for fila in range(len(nivel)):
@@ -190,6 +217,17 @@ while corriendo:
 
     # Aplicar gravedad
     velocidad_y += gravedad
+    
+    # Cuando el jugador se cae de la pantalla 
+    if verificar_muerte(jugador_y):
+        vidas -= 1
+        jugador_x, jugador_y = 90, 280  # Reiniciar la posición
+        velocidad_y = 0
+        if vidas <= 0:
+            JuegoTerminado.play()
+            messagebox.showinfo("Game Over", "Has perdido todas tus vidas.")
+            pygame.quit()
+            sys.exit()
 
     # Mover en Y y verificar colisiones
     jugador_y += velocidad_y
