@@ -128,19 +128,6 @@ Suelo = pygame.image.load('./Assets/images/Suelo.png')
 Suelo = pygame.transform.scale(Suelo, (50, 50))
 
 # Función para contar las monedas
-
-def conteoMonedas(monedas):
-    font = pygame.font.Font(None, 32)
-    text = font.render("Monedas: " + str(moneda), True, blanco)
-    text_rect = text.get_rect(center=(60, 10))
-    pantalla.blit(text, text_rect)
-
-def conteoVidas(vidas):
-    font = pygame.font.Font(None, 32)
-    text = font.render("Vidas: " + str(vidas), True, blanco)
-    text_rect = text.get_rect(center=(60, 50))
-    pantalla.blit(text, text_rect)
-
 conteoMonedas = lambda monedas: pantalla.blit(pygame.font.Font(None, 32).render("Monedas: " + str(monedas), True, blanco), (60, 10))
 
 # Función para contar las vidas
@@ -154,8 +141,17 @@ def actualizar_frame_animacion(tiempo_transcurrido, frames):
         frame_index = (frame_index + 1) % len(frames)
         tiempo_desde_ultimo_frame = 0
 
-# Función de muerte por caída
+# Función para actualizar el frame de la animación
+def actualizar_frame_animacion(tiempo_transcurrido, frames):
+    global frame_index, tiempo_desde_ultimo_frame
+    tiempo_desde_ultimo_frame += tiempo_transcurrido
+    if tiempo_desde_ultimo_frame >= animacion_reposo:
+        frame_index = (frame_index + 1) % len(frames)
+        tiempo_desde_ultimo_frame = 0
+
+# Función lambda para verificar la muerte por caida al vacio
 verificar_muerte = lambda y: y > ALTO
+
 # Función para actualizar el frame de la animación
 def actualizar_frame_animacion(tiempo_transcurrido, frames):
     global frame_index, tiempo_desde_ultimo_frame
