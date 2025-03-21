@@ -6,10 +6,12 @@ from jugador import Jugador
 from nivel import Nivel
 from config import *  # Importa todo desde config.py, incluido el mapa del nivel
 
+
 # Inicializar pygame
 pygame.init()
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
 clock = pygame.time.Clock()
+
 
 # Cargar imágenes
 imagenFondo = pygame.image.load('./Assets/images/Free-Pixel-Art-Cloud-and-Sky-Backgrounds5.jpg')

@@ -3,7 +3,6 @@ import sys
 import tkinter as tk
 from tkinter import messagebox
 
-
 root = tk.Tk()
 root.withdraw()  # Ocultar la ventana principal
 
@@ -67,6 +66,7 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO))
 clock = pygame.time.Clock()
 
 # Cargar imagen del jugador
+
 # Cargar los frames de la animación en una lista
 reposo_frames = [
     pygame.image.load("./Assets/images/Zorro/Reposo/Personaje Zorro ANIMADO1.png"),
@@ -118,30 +118,34 @@ Suelo = pygame.image.load('./Assets/images/Suelo.png')
 Suelo = pygame.transform.scale(Suelo, (50, 50))
 
 # Función para contar las monedas
-conteoMonedas = lambda monedas: pantalla.blit(pygame.font.Font(None, 32).render("Monedas: " + str(monedas), True, blanco), (60, 10))
+def conteoMonedas(monedas):
+    font = pygame.font.Font(None, 32)
+    text = font.render("Monedas: " + str(moneda), True, blanco)
+    text_rect = text.get_rect(center=(60, 10))
+    pantalla.blit(text, text_rect)
 
-# Función para contar las vidas
-conteoVidas = lambda vidas: pantalla.blit(pygame.font.Font(None, 32).render("Vidas: " + str(vidas), True, blanco), (60, 50))
-
-#Funciones que realiza el jugador
-# Función para actualizar el frame de la animación
-def actualizar_frame_animacion(tiempo_transcurrido, frames):
-    global frame_index, tiempo_desde_ultimo_frame
-    tiempo_desde_ultimo_frame += tiempo_transcurrido
-    if tiempo_desde_ultimo_frame >= animacion_reposo:
-        frame_index = (frame_index + 1) % len(frames)
-        tiempo_desde_ultimo_frame = 0
+def conteoVidas(vidas):
+    font = pygame.font.Font(None, 32)
+    text = font.render("Vidas: " + str(vidas), True, blanco)
+    text_rect = text.get_rect(center=(60, 50))
+    pantalla.blit(text, text_rect)
 
 # Función para actualizar el frame de la animación
+frame_index = 0  # Inicializamos el índice del frame
+animacion_tiempo = 100  # Tiempo entre frames en milisegundos
+ultimo_tiempo = pygame.time.get_ticks()
+#------------------------------------------------------------
 def actualizar_frame_animacion(tiempo_transcurrido, frames):
-    tiempo_desde_ultimo_frame = 0
-    global frame_index
-    tiempo_desde_ultimo_frame += tiempo_transcurrido
-    if tiempo_desde_ultimo_frame >= animacion_reposo:
+    global frame_index, ultimo_tiempo
+    
+    # Si ha pasado suficiente tiempo, cambiamos de frame
+    if tiempo_transcurrido - ultimo_tiempo > animacion_tiempo:
         frame_index = (frame_index + 1) % len(frames)
-        tiempo_desde_ultimo_frame = 0
+        ultimo_tiempo = tiempo_transcurrido  # Actualizamos el tiempo
 
-# Función lambda para verificar la muerte por caida al vacio
+    return frame_index  # Devolvemos el frame actualizado
+        
+#Funcion de muerte por caida  lamba
 verificar_muerte = lambda y: y > ALTO
 
 # Bucle del juego
@@ -152,8 +156,8 @@ while corriendo:
 
     # Dibujar el contador de monedas y de vidas
     conteoVidas(vidas)
-    conteoMonedas(moneda)   
-#Funciones que realiza el juego  
+    conteoMonedas(moneda)
+    
     # Dibujar el mapa
     muros = []
     for fila in range(len(nivel)):
@@ -184,7 +188,6 @@ while corriendo:
     else:
         mirando_atras = None
 
-#Funciones que realiza el jugador
     # Aplicar movimiento en X y verificar colisiones
     jugador_x += mov_x
     jugador = pygame.Rect(jugador_x, jugador_y, anchoJugador, alturaJugador)
@@ -199,17 +202,17 @@ while corriendo:
     # Aplicar gravedad
     velocidad_y += gravedad
     
-    # Cuando el jugador se cae de la pantalla 
+    #Cuando el jugador se cae de la pantalla 
     if verificar_muerte(jugador_y):
         vidas -= 1
         jugador_x, jugador_y = 90, 280  # Reiniciar la posición
         velocidad_y = 0
         if vidas <= 0:
-            JuegoTerminado.set_volume(0.1)  # Ajustar el volumen
             JuegoTerminado.play()
             messagebox.showinfo("Game Over", "Has perdido todas tus vidas.")
             pygame.quit()
             sys.exit()
+
 
     # Mover en Y y verificar colisiones
     jugador_y += velocidad_y
@@ -231,18 +234,22 @@ while corriendo:
         velocidad_y = FUERZA_SALTO
         en_suelo = False
 
-    # Actualizar y dibujar el jugador
-    if mov_x == 0 and en_suelo:  # Si el jugador está en reposo
-        actualizar_frame_animacion(tiempo_transcurrido, reposo_frames)
-        pantalla.blit(reposo_frames[frame_index], (jugador_x, jugador_y))
-    elif mov_x > 0 and en_suelo:  # Si el jugador está caminando
-        actualizar_frame_animacion(tiempo_transcurrido, caminar_frames)
-        pantalla.blit(caminar_frames[frame_index], (jugador_x, jugador_y))
-    elif mov_x < 0 and en_suelo:  # Si el jugador está caminando atras
-        actualizar_frame_animacion(tiempo_transcurrido, caminar_atras_frames)
-        pantalla.blit(caminar_atras_frames[frame_index], (jugador_x, jugador_y))
-    else:
-        pantalla.blit(Jugador_Imagen, (jugador_x, jugador_y))
+    # Obtener el tiempo actual
+tiempo_transcurrido = pygame.time.get_ticks()
+
+# Actualizar y dibujar el jugador 
+if mov_x == 0 and en_suelo:  # Si el jugador está en reposo
+    frame_index = actualizar_frame_animacion(tiempo_transcurrido, reposo_frames)
+    pantalla.blit(reposo_frames[frame_index], (jugador_x, jugador_y))
+elif mov_x > 0 and en_suelo:  # Si el jugador está caminando
+    frame_index = actualizar_frame_animacion(tiempo_transcurrido, caminar_frames)
+    pantalla.blit(caminar_frames[frame_index], (jugador_x, jugador_y))
+elif mov_x < 0 and en_suelo:  # Si el jugador está caminando hacia atrás
+    frame_index = actualizar_frame_animacion(tiempo_transcurrido, caminar_atras_frames)
+    pantalla.blit(caminar_atras_frames[frame_index], (jugador_x, jugador_y))
+else:
+    pantalla.blit(Jugador_Imagen, (jugador_x, jugador_y))
+
 
     # Manejar eventos
     for evento in pygame.event.get():
@@ -256,7 +263,6 @@ while corriendo:
                     moneda_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
                     if jugador.colliderect(moneda_rect):
                         nivel[fila][col] = 0  # Cambiar el valor a 0 para eliminar la moneda del mapa
-                        sonidoMoneda.set_volume(0.1)  # Ajustar el volumen
                         sonidoMoneda.play()  # Reproducir el sonido
                         moneda += 1
                         conteoMonedas(moneda)
@@ -267,12 +273,12 @@ while corriendo:
             if nivel[fila][col] == 2:  # Meta
                 meta_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
                 if jugador.colliderect(meta_rect):
-                    JuegoTerminado.set_volume(0.1)  # Ajustar el volumen
                     JuegoTerminado.play()
                     messagebox.showinfo("Mensaje", "Felicidades, ¡Has ganado!, Monedas recogidas: " + str(moneda))
                     # Cerrar la ventana principal
                     root.destroy()
                     corriendo = False
+    
 
     pygame.display.flip()
     clock.tick(30)
