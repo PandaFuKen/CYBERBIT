@@ -2,20 +2,16 @@ import pygame
 import sys
 import tkinter as tk
 from tkinter import messagebox
-from niveles import nivel1, nivel2, nivel3
 from listaNiveles import nivel_dict  
 
 class Juego:
     def Nivel(personaje, nivel_seleccionado):
         root = tk.Tk()
         root.withdraw()  # Ocultar la ventana principal
-    
-        # Mapa del nivel
-        #nivel = "nivel"+str(nivel_seleccionado)
        
-        nivel = nivel_dict.get(nivel_seleccionado)
-
-        print(nivel)
+        nivelData = nivel_dict.get(nivel_seleccionado)#Obtenemos los datos de la biblioteca del nivel seleccionado
+        nivel = nivelData["matriz"]#Obtenemos la matriz del nivel seleccionado
+        print("Nivel seleccionado: "+str(nivel))
         
         # Colores
         blanco = (255, 255, 255)
@@ -38,7 +34,7 @@ class Juego:
         FUERZA_SALTO = -16  # Fuerza del salto
 
         # Jugador
-        jugador_x, jugador_y = 90, 280
+        jugador_x, jugador_y = 90, 2240
         anchoJugador, alturaJugador = 47, 50
         velocidad_y = 0
         en_suelo = True
@@ -102,9 +98,9 @@ class Juego:
         Jugador_Imagen = pygame.transform.scale(Jugador_Imagen, (70, 70))  # Ajustado a 70x70
 
         # Cargar imagen de fondo
-        imagenFondo = pygame.image.load('./Assets/images/Free-Pixel-Art-Cloud-and-Sky-Backgrounds5.jpg')
+        imagenFondo = pygame.image.load(nivelData["fondo"]).convert()
         imagenFondo = pygame.transform.scale(imagenFondo, (ANCHO, ALTO))
-        # Imagen del portal
+        # Imagen del portal1
         Portal = pygame.image.load('./Assets/images/Portal1.png')
         Portal = pygame.transform.scale(Portal, (50, 50))
         # Imagen de la moneda
@@ -120,7 +116,7 @@ class Juego:
         sonidoGanaste = pygame.mixer.Sound("./Assets/sounds/GameEnd.wav")
 
         # Imagen de las Plataformas
-        Suelo = pygame.image.load('./Assets/images/Suelo.png')
+        Suelo = pygame.image.load(nivelData["suelo"])#imagenSuelo
         Suelo = pygame.transform.scale(Suelo, (60, 60))
 
         # Función para contar las monedas
@@ -185,7 +181,7 @@ class Juego:
                 mov_x = VelocidadJugador
                 mirando_atras = False
             else:
-                mirando_atras = True
+                mirando_atras = False
 
             # Aplicar movimiento en X y verificar colisiones
             jugador_x += mov_x
@@ -200,6 +196,13 @@ class Juego:
 
             # Aplicar gravedad
             velocidad_y += gravedad
+            
+            # Evitar que el personaje se salga de los límites laterales
+            if jugador_x < 0:
+                jugador_x = 0  # Límite izquierdo
+            elif jugador_x + 50 > ANCHO:  
+                jugador_x = ANCHO - 50  # Límite derecho (50 es el ancho del jugador)
+
             
             #Cuando el jugador se cae de la pantalla 
             if verificar_muerte(jugador_y):
@@ -273,7 +276,6 @@ class Juego:
                             # Cerrar la ventana principal
                             root.destroy()
                             corriendo = False
-            
 
             pygame.display.flip()
             clock.tick(30)

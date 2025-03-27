@@ -26,7 +26,7 @@ class MenuPersonajes:
 
     def dibujar(self):
         """Dibuja los personajes en la pantalla."""
-        imagenFondo = pygame.image.load('./Assets/images/Free-Pixel-Art-Cloud-and-Sky-Backgrounds2.png')
+        imagenFondo = pygame.image.load('./Assets/images/Fondos/Fondo1.png')
         imagenFondo = pygame.transform.scale(imagenFondo, (1366, 768))
         
         self.pantalla.blit(imagenFondo, (0, 0))  # Dibujar la imagen de fondo

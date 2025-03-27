@@ -10,7 +10,7 @@ class Menu:
         self.seleccion = 0
 
     def dibujar(self):
-        imagenFondo = pygame.image.load('./Assets/images/Free-Pixel-Art-Cloud-and-Sky-Backgrounds2.png')
+        imagenFondo = pygame.image.load('./Assets/images/Fondos/Fondo1.png')
         imagenFondo = pygame.transform.scale(imagenFondo, (1366, 768))
         
         """Dibuja el menú en pantalla"""
@@ -37,4 +37,7 @@ class Menu:
                 elif evento.key == pygame.K_RETURN:
                     sonidoMoneda.play()
                     return self.seleccion  # Retorna la opción seleccionada
+                #elif evento.key == pygame.K_ESCAPE:
+                    
+                
         return None

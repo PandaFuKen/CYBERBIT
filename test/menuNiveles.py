@@ -10,24 +10,37 @@ class MenuNiveles:
 
         self.niveles = ["Nivel 1",
                         "Nivel 2",
-                        "Nivel 3"]
+                        "Nivel 3",
+                        "Nivel 4"]
         self.posiciones = [(200, 200), (520, 200), (840, 200)]
         
         self.seleccion = 0  # Índice del nivel seleccionado
 
     def dibujar(self):
         """Dibuja los niveles en la pantalla como texto en lugar de imágenes."""
-        imagenFondo = pygame.image.load('./Assets/images/Free-Pixel-Art-Cloud-and-Sky-Backgrounds2.png')
+        imagenFondo = pygame.image.load('./Assets/images/Fondos/Fondo1.png')
         imagenFondo = pygame.transform.scale(imagenFondo, (1366, 768))
         self.pantalla.blit(imagenFondo, (0, 0))  # Dibujar la imagen de fondo
 
-        for i, (x, y) in enumerate(self.posiciones):
+        COLUMNAS = 3  # Cantidad de niveles por fila
+        ESPACIO_X = 420  # Espacio horizontal entre botones
+        ESPACIO_Y = 80   # Espacio vertical entre filas
+        INICIO_X = 100   # Posición inicial en X
+        INICIO_Y = 100   # Posición inicial en Y
+
+        for i, nivel in enumerate(self.niveles):
+            fila = i // COLUMNAS
+            columna = i % COLUMNAS
+            x = INICIO_X + columna * ESPACIO_X
+            y = INICIO_Y + fila * ESPACIO_Y
+
             color_cuadro = (242, 54, 12) if i == self.seleccion else (180, 180, 180)
             pygame.draw.rect(self.pantalla, color_cuadro, (x - 10, y - 10, 200, 60), border_radius=10)
 
             color_texto = (0, 0, 0)  # Color del texto
-            texto = self.fuente.render(self.niveles[i], True, color_texto)
+            texto = self.fuente.render(nivel, True, color_texto)
             self.pantalla.blit(texto, (x, y))
+
 
         # Mostrar mensaje de selección
         mensaje = self.fuente.render("Presiona Enter para elegir", True, (0, 0, 0))
@@ -46,9 +59,13 @@ class MenuNiveles:
                     self.seleccion = (self.seleccion - 1) % len(self.niveles)
                 elif evento.key == pygame.K_RIGHT:
                     self.seleccion = (self.seleccion + 1) % len(self.niveles)
+                elif evento.key == pygame.K_UP:
+                    self.seleccion = (self.seleccion - 3) % len(self.niveles)
+                elif evento.key == pygame.K_DOWN:
+                    self.seleccion = (self.seleccion + 3) % len(self.niveles)
                 elif evento.key == pygame.K_RETURN:
                     sonidoMoneda.play()
-                    return self.seleccion  # Retorna el nivel seleccionado
+                    return self.seleccion+1  # Retorna el nivel seleccionado
                 
                 
 
