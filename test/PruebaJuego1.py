@@ -86,6 +86,7 @@ caminar_frames = [
 # Ajustamos el tamaño de los frames de caminar
 caminar_frames = [pygame.transform.scale(frame, (70, 70)) for frame in caminar_frames]
 
+
 # Cargar los frames de la animación de caminar ATRAS
 caminar_atras_frames = [
     pygame.image.load("./Assets/images/Zorrito/Caminar Atras/Zorrito Caminando ATRAS1.png"),
@@ -93,8 +94,7 @@ caminar_atras_frames = [
     pygame.image.load("./Assets/images/Zorrito/Caminar Atras/Zorrito Caminando ATRAS3.png"),
     pygame.image.load("./Assets/images/Zorrito/Caminar Atras/Zorrito Caminando ATRAS4.png")
 ]
-# Ajustamos el tamaño de los frames de caminar ATRAS
-caminar_atras_frames = [pygame.transform.scale(frame, (70, 70)) for frame in caminar_atras_frames]
+
 
 # Cargar y ajustar el tamaño de la imagen del jugador
 Jugador_Imagen = pygame.image.load("./Assets/images/Zorrito/Caminar/Personaje Zorro CAMINANDO1.png")
