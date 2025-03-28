@@ -4,7 +4,8 @@ import tkinter as tk
 from tkinter import messagebox
 from listaNiveles import nivel_dict  
 
-class Juego:
+class Juego:#A traves de esta clase se ejecutan los metodos que hacen que la partida funcione
+            #Como son los movimientos del personaje, acciones, diseño del nivel, etc.
     def Nivel(personaje, nivel_seleccionado):
         root = tk.Tk()
         root.withdraw()  # Ocultar la ventana principal

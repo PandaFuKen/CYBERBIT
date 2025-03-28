@@ -1,6 +1,7 @@
 from niveles import nivel1,nivel2,nivel3, nivel4
+#Almacenamos los distintos objetos, escenarios de fondo, enemigos, y diseños del suelo para cada nivel
 nivel_dict = {
-    1: {
+    1: {#En caso de que el nivel seleccionado sea 1, importamos estos datos al juego
         "matriz": nivel1,
         "fondo": "./Assets/images/Fondos/Fondo1.png",
         "suelo": "./Assets/images/Suelo.png"

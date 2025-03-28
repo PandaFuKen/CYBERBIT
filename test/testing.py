@@ -6,7 +6,7 @@ from tkinter import messagebox
 
 root = tk.Tk()
 root.withdraw()  # Ocultar la ventana principal
-
+#Version 2 de la entrega del reporte 14/03/25, No se usa
 # Colores
 blanco = (255, 255, 255)
 rojo = (255, 0, 0)

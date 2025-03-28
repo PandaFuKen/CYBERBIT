@@ -5,7 +5,7 @@ from menuPersonajes import MenuPersonajes
 from juego import Juego
 from menuNiveles import MenuNiveles
 
-pygame.init()
+pygame.init()#Clase principal a traves de la cual se inicia el juego
 pantalla = pygame.display.set_mode((1366, 768))
 pygame.display.set_caption("Menú Principal")
 

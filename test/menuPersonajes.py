@@ -3,7 +3,7 @@ import sys
 from juego import Juego
 from menu import Menu
 
-class MenuPersonajes:
+class MenuPersonajes:#Menu a traves del cual el jugador selecciona el personaje
     def __init__(self, pantalla):
         self.pantalla = pantalla
         self.fuente = pygame.font.Font(None, 50)

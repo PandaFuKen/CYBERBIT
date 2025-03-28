@@ -3,7 +3,7 @@ import sys
 from juego import Juego
 from menu import Menu
 
-class MenuNiveles:
+class MenuNiveles:#Menu a traves del cual mostramos y el usuario selecciona de la lista de niveles que estan dentro del videojuego
     def __init__(self, pantalla, personaje_seleccionado):
         self.pantalla = pantalla
         self.fuente = pygame.font.Font(None, 50)
@@ -28,7 +28,7 @@ class MenuNiveles:
         INICIO_X = 100   # Posición inicial en X
         INICIO_Y = 100   # Posición inicial en Y
 
-        for i, nivel in enumerate(self.niveles):
+        for i, nivel in enumerate(self.niveles):#Colores y diseño de los cuadros de seleccion de nivel
             fila = i // COLUMNAS
             columna = i % COLUMNAS
             x = INICIO_X + columna * ESPACIO_X
@@ -65,6 +65,9 @@ class MenuNiveles:
                     self.seleccion = (self.seleccion + 3) % len(self.niveles)
                 elif evento.key == pygame.K_RETURN:
                     sonidoMoneda.play()
+                elif evento.key == pygame.K_ESCAPE:
+                    
+                    
                     return self.seleccion+1  # Retorna el nivel seleccionado
                 
                 

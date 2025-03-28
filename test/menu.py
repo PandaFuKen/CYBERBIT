@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-class Menu:
+class Menu:#Menu de inicio principal
     def __init__(self, pantalla):
         pantalla = pygame.display.set_mode((1366, 768))
         self.pantalla = pantalla
