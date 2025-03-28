@@ -3,9 +3,10 @@ import sys
 import tkinter as tk
 from tkinter import messagebox
 
+
 root = tk.Tk()
 root.withdraw()  # Ocultar la ventana principal
-
+#Version 2 de la entrega del reporte 14/03/25, No se usa
 # Colores
 blanco = (255, 255, 255)
 rojo = (255, 0, 0)
@@ -28,7 +29,7 @@ FUERZA_SALTO = -16  # Fuerza del salto
 
 # Jugador
 jugador_x, jugador_y = 90, 280
-anchoJugador, alturaJugador = 70, 70  # Actualizado a 70x70
+anchoJugador, alturaJugador = 50, 50  # Actualizado a 70x70
 velocidad_y = 0
 en_suelo = False
 frame_index = 0
@@ -68,20 +69,20 @@ clock = pygame.time.Clock()
 # Cargar imagen del jugador
 # Cargar los frames de la animación en una lista
 reposo_frames = [
-    pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO1.png"),
-    pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO2.png"),
-    pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO3.png"),
-    pygame.image.load("./Assets/images/Zorrito/Reposo/Personaje Zorro ANIMADO4.png")
+    pygame.image.load("./Assets/images/Zorro/Reposo/Personaje Zorro ANIMADO1.png"),
+    pygame.image.load("./Assets/images/Zorro/Reposo/Personaje Zorro ANIMADO2.png"),
+    pygame.image.load("./Assets/images/Zorro/Reposo/Personaje Zorro ANIMADO3.png"),
+    pygame.image.load("./Assets/images/Zorro/Reposo/Personaje Zorro ANIMADO4.png")
 ]
 # Ajustamos el tamaño de los frames
 reposo_frames = [pygame.transform.scale(frame, (70, 70)) for frame in reposo_frames]
 
 # Cargar los frames de la animación de caminar
 caminar_frames = [
-    pygame.image.load("./Assets/images/Zorrito/Caminar/Personaje Zorro CAMINANDO1.png"),
-    pygame.image.load("./Assets/images/Zorrito/Caminar/Personaje Zorro CAMINANDO2.png"),
-    pygame.image.load("./Assets/images/Zorrito/Caminar/Personaje Zorro CAMINANDO3.png"),
-    pygame.image.load("./Assets/images/Zorrito/Caminar/Personaje Zorro CAMINANDO4.png")
+    pygame.image.load("./Assets/images/Zorro/Caminar/Personaje Zorro CAMINANDO1.png"),
+    pygame.image.load("./Assets/images/Zorro/Caminar/Personaje Zorro CAMINANDO2.png"),
+    pygame.image.load("./Assets/images/Zorro/Caminar/Personaje Zorro CAMINANDO3.png"),
+    pygame.image.load("./Assets/images/Zorro/Caminar/Personaje Zorro CAMINANDO4.png")
 ]
 # Ajustamos el tamaño de los frames de caminar
 caminar_frames = [pygame.transform.scale(frame, (70, 70)) for frame in caminar_frames]
@@ -89,15 +90,15 @@ caminar_frames = [pygame.transform.scale(frame, (70, 70)) for frame in caminar_f
 
 # Cargar los frames de la animación de caminar ATRAS
 caminar_atras_frames = [
-    pygame.image.load("./Assets/images/Zorrito/Caminar Atras/Zorrito Caminando ATRAS1.png"),
-    pygame.image.load("./Assets/images/Zorrito/Caminar Atras/Zorrito Caminando ATRAS2.png"),
-    pygame.image.load("./Assets/images/Zorrito/Caminar Atras/Zorrito Caminando ATRAS3.png"),
-    pygame.image.load("./Assets/images/Zorrito/Caminar Atras/Zorrito Caminando ATRAS4.png")
+    pygame.image.load("./Assets/images/Zorro/Caminar Atras/Zorro Caminando ATRAS1.png"),
+    pygame.image.load("./Assets/images/Zorro/Caminar Atras/Zorro Caminando ATRAS2.png"),
+    pygame.image.load("./Assets/images/Zorro/Caminar Atras/Zorro Caminando ATRAS3.png"),
+    pygame.image.load("./Assets/images/Zorro/Caminar Atras/Zorro Caminando ATRAS4.png")
 ]
 
 
 # Cargar y ajustar el tamaño de la imagen del jugador
-Jugador_Imagen = pygame.image.load("./Assets/images/Zorrito/Caminar/Personaje Zorro CAMINANDO1.png")
+Jugador_Imagen = pygame.image.load("./Assets/images/Zorro/Caminar/Personaje Zorro CAMINANDO1.png")
 Jugador_Imagen = pygame.transform.scale(Jugador_Imagen, (70, 70))  # Ajustado a 70x70
 
 # Cargar imagen de fondo
@@ -117,18 +118,12 @@ Suelo = pygame.image.load('./Assets/images/Suelo.png')
 Suelo = pygame.transform.scale(Suelo, (50, 50))
 
 # Función para contar las monedas
-def conteoMonedas(monedas):
-    font = pygame.font.Font(None, 32)
-    text = font.render("Monedas: " + str(moneda), True, blanco)
-    text_rect = text.get_rect(center=(60, 10))
-    pantalla.blit(text, text_rect)
+conteoMonedas = lambda monedas: pantalla.blit(pygame.font.Font(None, 32).render("Monedas: " + str(monedas), True, blanco), (60, 10))
 
-def conteoVidas(vidas):
-    font = pygame.font.Font(None, 32)
-    text = font.render("Vidas: " + str(vidas), True, blanco)
-    text_rect = text.get_rect(center=(60, 50))
-    pantalla.blit(text, text_rect)
+# Función para contar las vidas
+conteoVidas = lambda vidas: pantalla.blit(pygame.font.Font(None, 32).render("Vidas: " + str(vidas), True, blanco), (60, 50))
 
+#Funciones que realiza el jugador
 # Función para actualizar el frame de la animación
 def actualizar_frame_animacion(tiempo_transcurrido, frames):
     global frame_index, tiempo_desde_ultimo_frame
@@ -136,6 +131,18 @@ def actualizar_frame_animacion(tiempo_transcurrido, frames):
     if tiempo_desde_ultimo_frame >= animacion_reposo:
         frame_index = (frame_index + 1) % len(frames)
         tiempo_desde_ultimo_frame = 0
+
+# Función para actualizar el frame de la animación
+def actualizar_frame_animacion(tiempo_transcurrido, frames):
+    tiempo_desde_ultimo_frame = 0
+    global frame_index
+    tiempo_desde_ultimo_frame += tiempo_transcurrido
+    if tiempo_desde_ultimo_frame >= animacion_reposo:
+        frame_index = (frame_index + 1) % len(frames)
+        tiempo_desde_ultimo_frame = 0
+
+# Función lambda para verificar la muerte por caida al vacio
+verificar_muerte = lambda y: y > ALTO
 
 # Bucle del juego
 corriendo = True
@@ -145,8 +152,8 @@ while corriendo:
 
     # Dibujar el contador de monedas y de vidas
     conteoVidas(vidas)
-    conteoMonedas(moneda)
-
+    conteoMonedas(moneda)   
+#Funciones que realiza el juego  
     # Dibujar el mapa
     muros = []
     for fila in range(len(nivel)):
@@ -177,6 +184,7 @@ while corriendo:
     else:
         mirando_atras = None
 
+#Funciones que realiza el jugador
     # Aplicar movimiento en X y verificar colisiones
     jugador_x += mov_x
     jugador = pygame.Rect(jugador_x, jugador_y, anchoJugador, alturaJugador)
@@ -190,6 +198,18 @@ while corriendo:
 
     # Aplicar gravedad
     velocidad_y += gravedad
+    
+    # Cuando el jugador se cae de la pantalla 
+    if verificar_muerte(jugador_y):
+        vidas -= 1
+        jugador_x, jugador_y = 90, 280  # Reiniciar la posición
+        velocidad_y = 0
+        if vidas <= 0:
+            JuegoTerminado.set_volume(0.1)  # Ajustar el volumen
+            JuegoTerminado.play()
+            messagebox.showinfo("Game Over", "Has perdido todas tus vidas.")
+            pygame.quit()
+            sys.exit()
 
     # Mover en Y y verificar colisiones
     jugador_y += velocidad_y
@@ -236,6 +256,7 @@ while corriendo:
                     moneda_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
                     if jugador.colliderect(moneda_rect):
                         nivel[fila][col] = 0  # Cambiar el valor a 0 para eliminar la moneda del mapa
+                        sonidoMoneda.set_volume(0.1)  # Ajustar el volumen
                         sonidoMoneda.play()  # Reproducir el sonido
                         moneda += 1
                         conteoMonedas(moneda)
@@ -246,6 +267,7 @@ while corriendo:
             if nivel[fila][col] == 2:  # Meta
                 meta_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
                 if jugador.colliderect(meta_rect):
+                    JuegoTerminado.set_volume(0.1)  # Ajustar el volumen
                     JuegoTerminado.play()
                     messagebox.showinfo("Mensaje", "Felicidades, ¡Has ganado!, Monedas recogidas: " + str(moneda))
                     # Cerrar la ventana principal
