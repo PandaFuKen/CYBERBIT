@@ -99,23 +99,23 @@ caminar_atras_frames = [
 caminar_atras_frames = [pygame.transform.scale(frame, (70, 70)) for frame in caminar_atras_frames]
 
 # Cargar y ajustar el tamaño de la imagen del jugador
-Jugador_Imagen = pygame.image.load("./Assets/images/Zorro/Caminar/Personaje Zorro CAMINANDO1.png")
+Jugador_Imagen = pygame.image.load("/Assets/images/Zorro/Caminar/Personaje Zorro CAMINANDO1.png")
 Jugador_Imagen = pygame.transform.scale(Jugador_Imagen, (70, 70))  # Ajustado a 70x70
 
 # Cargar imagen de fondo
-imagenFondo = pygame.image.load('./Assets/images/Free-Pixel-Art-Cloud-and-Sky-Backgrounds5.jpg')
+imagenFondo = pygame.image.load('/Assets/images/Fondos/Fondo1.png')
 imagenFondo = pygame.transform.scale(imagenFondo, (ANCHO, ALTO))
 # Imagen del portal
-Portal = pygame.image.load('./Assets/images/Portal1.png')
+Portal = pygame.image.load('/Assets/images/Portal1.png')
 Portal = pygame.transform.scale(Portal, (50, 50))
 # Imagen de la moneda
-Moneda = pygame.image.load('./Assets/images/Moneda.png')
+Moneda = pygame.image.load('/Assets/images/Moneda.png')
 Moneda = pygame.transform.scale(Moneda, (50, 50))
-sonidoMoneda = pygame.mixer.Sound("./Assets/sounds/Moneda.wav")
-JuegoTerminado = pygame.mixer.Sound("./Assets/sounds/GameEnd.wav")
+sonidoMoneda = pygame.mixer.Sound("/Assets/sounds/Moneda.wav")
+JuegoTerminado = pygame.mixer.Sound("/Assets/sounds/GameEnd.wav")
 
 # Imagen de las Plataformas
-Suelo = pygame.image.load('./Assets/images/Suelo.png')
+Suelo = pygame.image.load('/Assets/images/Suelo.png')
 Suelo = pygame.transform.scale(Suelo, (50, 50))
 
 # Función para contar las monedas
@@ -148,6 +148,38 @@ def actualizar_frame_animacion(tiempo_transcurrido, frames):
         
 #Funcion de muerte por caida  lamba
 verificar_muerte = lambda y: y > ALTO
+es_tipo_bloque = lambda fila, col, tipo: nivel[fila][col] == tipo
+colisiona = lambda jugador, rect: jugador.colliderect(rect)
+aplicar_gravedad = lambda velocidad_y, gravedad: velocidad_y + gravedad
+toca_moneda = lambda jugador, moneda_rect: jugador.colliderect(moneda_rect)
+toca_meta = lambda jugador, meta_rect: jugador.colliderect(meta_rect)
+reiniciar_posicion = lambda: (90, 280, 0)
+
+tocar_moneda = lambda fila, col: (
+    nivel.__setitem__(fila, nivel[fila][:col] + [0] + nivel[fila][col + 1:]),
+    sonidoMoneda.play(),
+    globals().__setitem__('moneda', moneda + 1),
+    conteoMonedas(moneda)
+)
+
+tocar_meta = lambda: (
+    JuegoTerminado.play(),
+    messagebox.showinfo("Mensaje", f"Felicidades, ¡Has ganado!, Monedas recogidas: {moneda}"),
+    root.destroy(),
+    globals().__setitem__('corriendo', False)
+)
+
+salir_juego = lambda: (pygame.quit(), sys.exit())
+
+perder_vida = lambda: (
+    globals().__setitem__('vidas', vidas - 1),
+    globals().__setitem__('jugador_x', 90),
+    globals().__setitem__('jugador_y', 280),
+    globals().__setitem__('velocidad_y', 0),
+    (pygame.quit(), sys.exit()) if vidas <= 0 else None
+)
+
+dibujar_elemento = lambda imagen, x, y: pantalla.blit(imagen, (x, y))
 
 # Bucle del juego
 corriendo = True
@@ -201,7 +233,7 @@ while corriendo:
                 jugador_x = muro.right
 
     # Aplicar gravedad
-    velocidad_y += gravedad
+    velocidad_y = aplicar_gravedad(velocidad_y, gravedad)
     
     #Cuando el jugador se cae de la pantalla 
     if verificar_muerte(jugador_y):
@@ -255,30 +287,23 @@ else:
     # Manejar eventos
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
-            corriendo = False
+            salir_juego()
 
         # Comprobar si el jugador toca una moneda
         for fila in range(len(nivel)):
             for col in range(len(nivel[fila])):
-                if nivel[fila][col] == 3:  # Si hay una moneda
+                if es_tipo_bloque(fila, col, 3):  # Si hay una moneda
                     moneda_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
-                    if jugador.colliderect(moneda_rect):
-                        nivel[fila][col] = 0  # Cambiar el valor a 0 para eliminar la moneda del mapa
-                        sonidoMoneda.play()  # Reproducir el sonido
-                        moneda += 1
-                        conteoMonedas(moneda)
+                    if toca_moneda(jugador, moneda_rect):
+                        tocar_moneda(fila, col)
 
     # Comprobar si toca la meta
     for fila in range(len(nivel)):
         for col in range(len(nivel[fila])):
-            if nivel[fila][col] == 2:  # Meta
+            if es_tipo_bloque(fila, col, 2):  # Meta
                 meta_rect = pygame.Rect(col * TAMANO_CELDA, fila * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA)
-                if jugador.colliderect(meta_rect):
-                    JuegoTerminado.play()
-                    messagebox.showinfo("Mensaje", "Felicidades, ¡Has ganado!, Monedas recogidas: " + str(moneda))
-                    # Cerrar la ventana principal
-                    root.destroy()
-                    corriendo = False
+                if toca_meta(jugador, meta_rect):
+                    tocar_meta()
     
 
     pygame.display.flip()
